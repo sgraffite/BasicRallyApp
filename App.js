@@ -3,7 +3,16 @@ Ext.define('CustomApp', {
     componentCls: 'app',
     launch: function() {
         console.log('Tacos are yummy!');
-        //this._loadData();
+        
+        this.pulldownContainer = Ext.create('Ext.container.Container', {
+            id: 'taco',
+            layout: {
+                type: 'hbox',
+                align: 'stretch'
+            }
+        });
+
+        this.add(this.pulldownContainer);
         this._loadIterations();
     },
 
@@ -21,7 +30,7 @@ Ext.define('CustomApp', {
                 scope: this
             },
         });
-        this.add(this.iterationsComboBox);
+        this.pulldownContainer.add(this.iterationsComboBox);
     },
 
     // Load severities
@@ -40,7 +49,7 @@ Ext.define('CustomApp', {
                 scope: this
             },
         });
-        this.add(this.severitiesComboBox);
+        this.pulldownContainer.add(this.severitiesComboBox);
     },
 
     // Load data
@@ -49,25 +58,35 @@ Ext.define('CustomApp', {
         let selectedSeverity = this.severitiesComboBox.getRecord().get('value');
         console.log(selectedSeverity)
         console.log('selectedIteration', selectedIteration);
+
+        let filters = [
+            {
+                property: 'Iteration',
+                operation: '=',
+                value: selectedIteration
+            },
+            {
+                property: 'Severity',
+                operation: '=',
+                value: selectedSeverity
+            }
+        ];
+
+        if(this.store){
+            this.store.setFilter(filters);
+            this.store.load();
+            return;
+        }
+
         this.store = Ext.create('Rally.data.wsapi.Store', {
             model: 'Defect',
             autoLoad: true,
-            filters:[
-                {
-                    property: 'Iteration',
-                    operation: '=',
-                    value: selectedIteration
-                },
-                {
-                    property: 'Severity',
-                    operation: '=',
-                    value: selectedSeverity
-                }
-            ],
+            filters: filters,
             listeners: {
                 load: function(store, data, success) {
-                    console.log('got data!', data, success);
-                    this._loadGrid();
+                    if(!this.grid){
+                        this._createGrid();
+                    }
                 },
                 scope: this
             },
@@ -76,7 +95,7 @@ Ext.define('CustomApp', {
     },
 
     // Load grid
-    _loadGrid: function(){
+    _createGrid: function(){
         this.grid = Ext.create('Rally.ui.grid.Grid', {
             store: this.store,
             columnCfgs: [
