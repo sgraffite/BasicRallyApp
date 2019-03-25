@@ -24,13 +24,8 @@ Ext.define('CustomApp', {
             labelAlign: 'right',
             width: 400,
             listeners: {
-                ready: function(comboBox){
-                    this._loadSeverities();
-                },
-                select: function(comboBox, records) {
-                    console.log(records);
-                    this._loadData();
-                },
+                ready: this._loadSeverities,
+                select: this._loadData,
                 scope: this
             },
         });
@@ -47,13 +42,8 @@ Ext.define('CustomApp', {
             model: 'Defect',
             field: 'Severity',
             listeners: {
-                ready: function(comboBox){
-                    this._loadData();
-                },
-                select: function(comboBox, records) {
-                    console.log(records);
-                    this._loadData();
-                },
+                ready: this._loadData,
+                select: this._loadData,
                 scope: this
             },
         });
