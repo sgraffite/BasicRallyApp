@@ -19,6 +19,9 @@ Ext.define('CustomApp', {
     // Load iterations
     _loadIterations: function(){
         this.iterationsComboBox = Ext.create('Rally.ui.combobox.IterationComboBox', {
+            fieldLabel: 'Iteration',
+            labelAlign: 'right',
+            width: 400,
             listeners: {
                 ready: function(comboBox){
                     this._loadSeverities();
@@ -36,6 +39,8 @@ Ext.define('CustomApp', {
     // Load severities
     _loadSeverities: function(){
         this.severitiesComboBox = Ext.create('Rally.ui.combobox.FieldValueComboBox', {
+            fieldLabel: 'Severity',
+            labelAlign: 'right',
             model: 'Defect',
             field: 'Severity',
             listeners: {
@@ -52,6 +57,22 @@ Ext.define('CustomApp', {
         this.pulldownContainer.add(this.severitiesComboBox);
     },
 
+    _getFilters: function(iterationValue, severityValue){
+        let iterationFilter = Ext.create('Rally.data.wsapi.Filter', {
+            property: 'Iteration',
+            operation: '=',
+            value: iterationValue
+        });
+
+        let severityFilter = Ext.create('Rally.data.wsapi.Filter', {
+            property: 'Severity',
+            operation: '=',
+            value: severityValue
+        });
+
+        return iterationFilter.and(severityFilter);
+    },
+
     // Load data
     _loadData: function(){
         let selectedIteration = this.iterationsComboBox.getRecord().get('_ref');
@@ -59,19 +80,9 @@ Ext.define('CustomApp', {
         console.log(selectedSeverity)
         console.log('selectedIteration', selectedIteration);
 
-        let filters = [
-            {
-                property: 'Iteration',
-                operation: '=',
-                value: selectedIteration
-            },
-            {
-                property: 'Severity',
-                operation: '=',
-                value: selectedSeverity
-            }
-        ];
 
+
+        let filters = this._getFilters(selectedIteration, selectedSeverity);
         if(this.store){
             this.store.setFilter(filters);
             this.store.load();
