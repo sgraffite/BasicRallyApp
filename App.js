@@ -1,24 +1,25 @@
 Ext.define('CustomApp', {
     extend: 'Rally.app.App',
     componentCls: 'app',
-    launch: function() {
-        console.log('Tacos are yummy!');
-        
-        this.pulldownContainer = Ext.create('Ext.container.Container', {
-            id: 'taco',
+    items:[
+        {
+            xtype: 'container',
+            itemId: 'pulldown-container',
             layout: {
                 type: 'hbox',
                 align: 'stretch'
             }
-        });
-
-        this.add(this.pulldownContainer);
+        }
+    ],
+    launch: function() {
+        console.log('Tacos are yummy!');
         this._loadIterations();
     },
 
     // Load iterations
     _loadIterations: function(){
-        this.iterationsComboBox = Ext.create('Rally.ui.combobox.IterationComboBox', {
+        let iterationsComboBox = Ext.create('Rally.ui.combobox.IterationComboBox', {
+            itemId: 'iteration-combobox',
             fieldLabel: 'Iteration',
             labelAlign: 'right',
             width: 400,
@@ -33,12 +34,14 @@ Ext.define('CustomApp', {
                 scope: this
             },
         });
-        this.pulldownContainer.add(this.iterationsComboBox);
+        let container = this.down('#pulldown-container');
+        container.add(iterationsComboBox);
     },
 
     // Load severities
     _loadSeverities: function(){
-        this.severitiesComboBox = Ext.create('Rally.ui.combobox.FieldValueComboBox', {
+        let severitiesComboBox = Ext.create('Rally.ui.combobox.FieldValueComboBox', {
+            itemId: 'severity-combobox',
             fieldLabel: 'Severity',
             labelAlign: 'right',
             model: 'Defect',
@@ -54,7 +57,9 @@ Ext.define('CustomApp', {
                 scope: this
             },
         });
-        this.pulldownContainer.add(this.severitiesComboBox);
+
+        let container = this.down('#pulldown-container');
+        container.add(severitiesComboBox);
     },
 
     _getFilters: function(iterationValue, severityValue){
@@ -75,8 +80,8 @@ Ext.define('CustomApp', {
 
     // Load data
     _loadData: function(){
-        let selectedIteration = this.iterationsComboBox.getRecord().get('_ref');
-        let selectedSeverity = this.severitiesComboBox.getRecord().get('value');
+        let selectedIteration = this.down('#iteration-combobox').getRecord().get('_ref');
+        let selectedSeverity = this.down('#severity-combobox').getRecord().get('value');
         console.log(selectedSeverity)
         console.log('selectedIteration', selectedIteration);
 
